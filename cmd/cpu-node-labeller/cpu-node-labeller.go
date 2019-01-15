@@ -25,9 +25,9 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/cpu-node-labeller/pkg/client"
-	"github.com/cpu-node-labeller/pkg/node"
 	"github.com/golang/glog"
+	"github.com/ksimon1/cpu-node-labeller/pkg/client"
+	"github.com/ksimon1/cpu-node-labeller/pkg/node"
 )
 
 func main() {
