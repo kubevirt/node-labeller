@@ -24,18 +24,17 @@
 #   go-tests = true
 #   unused-packages = true
 
+[[constraint]]
+  name = "k8s.io/client-go"
+  version = "8.0.0"
 
 [[constraint]]
   branch = "master"
   name = "github.com/golang/glog"
 
-[[constraint]]
-  branch = "master"
+[[override]]
   name = "k8s.io/api"
-
-[[constraint]]
-  name = "k8s.io/client-go"
-  version = "9.0.0"
+  version = "kubernetes-1.11.4"
 
 [prune]
   go-tests = true
