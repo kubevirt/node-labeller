@@ -31,9 +31,11 @@ import (
 )
 
 func main() {
-	glog.Infof("Running cpu-node-labeller")
 	fileName := flag.String("fileName", "cpu-model-nfd-plugin", "file Name")
 	fileDir := flag.String("fileDir", "/etc/kubernetes/node-feature-discovery/source.d/", "file folder")
+	flag.Parse()
+
+	glog.Infof("Running cpu-node-labeller")
 
 	path := filepath.Join(*fileDir, *fileName)
 	filestat, err := os.Stat(path)
@@ -83,4 +85,6 @@ func main() {
 		glog.Fatalf("error while updating node: %s", err)
 		os.Exit(1)
 	}
+
+	glog.Info("updated node!")
 }
