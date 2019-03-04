@@ -61,7 +61,7 @@ spec:
         command: ["sleep"]
         args: ["infinity"]
       initContainers:
-        - image: quay.io/ksimon/kubevirt-cpu-model-nfd-plugin:0.0.1
+        - image: quay.io/ksimon/kubevirt-cpu-model-nfd-plugin:0.0.2
           command: ["/bin/sh","-c"]
           args: ["cp /plugin/dest/cpu-model-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
           imagePullPolicy: Always
