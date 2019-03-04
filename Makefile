@@ -1,10 +1,12 @@
 all: docker clean
 
-push:
-	docker push quay.io/ksimon/cpu-node-labeller:latest
+VERSION="0.0.3"
 
-docker: binary
-	docker build -t quay.io/ksimon/cpu-node-labeller:latest .
+push-image:
+	docker push quay.io/ksimon/kubevirt-cpu-node-labeller:${VERSION}
+
+image: binary
+	docker build -t quay.io/ksimon/kubevirt-cpu-node-labeller:${VERSION} .
 
 binary: dep
 	go build cmd/cpu-node-labeller/cpu-node-labeller.go
@@ -15,4 +17,4 @@ dep:
 clean:
 	rm -f cpu-node-labeller
 
-.PHONY: all push docker binary clean
+.PHONY: all push-image image binary clean
