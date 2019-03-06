@@ -1,4 +1,4 @@
-FROM fedora:28
+FROM centos:7
 
 LABEL maintainer="ksimon@redhat.com"
 

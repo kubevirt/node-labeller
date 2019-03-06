@@ -21,6 +21,8 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,37 +33,24 @@ import (
 )
 
 func main() {
-	fileName := flag.String("fileName", "cpu-model-nfd-plugin", "file Name")
 	fileDir := flag.String("fileDir", "/etc/kubernetes/node-feature-discovery/source.d/", "file folder")
 	flag.Parse()
 
 	glog.Infof("Running cpu-node-labeller")
 
-	path := filepath.Join(*fileDir, *fileName)
-	filestat, err := os.Stat(path)
+	files, err := ioutil.ReadDir(*fileDir)
 	if err != nil {
-		glog.Fatalf("error while checking file: %s", err)
+		glog.Fatalf("could not access directory with files: %s", err)
 		os.Exit(1)
 	}
 
-	cpuModels := make(map[string]string)
-	if filestat.Mode().IsRegular() {
-		cmd := exec.Command(path)
-		var stdout bytes.Buffer
-		var stderr bytes.Buffer
-		cmd.Stdout = &stdout
-		cmd.Stderr = &stderr
-
-		// Run hook
-		err = cmd.Run()
-
-		lines := bytes.Split(stdout.Bytes(), []byte("\n"))
-		for _, cpuModel := range lines {
-			if len(cpuModel) == 0 {
-				continue
-			}
-
-			cpuModels[string(cpuModel)] = "true"
+	features := make(map[string]string)
+	for _, file := range files {
+		fileName := file.Name()
+		err := runFile(*fileDir, fileName, features)
+		if err != nil {
+			glog.Warning("could not run file: " + fmt.Sprintf("%s, %s", fileName, err))
+			continue
 		}
 	}
 
@@ -77,8 +66,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	node.RemoveCPUModelNodeLabels(n)
-	node.AddNodeLabels(n, cpuModels)
+	oldLabels := node.GetNodeLabellerLabels(n)
+	node.RemoveCPUModelNodeLabels(n, oldLabels)
+	node.AddNodeLabels(n, features)
 
 	err = node.UpdateNode(cli, n)
 	if err != nil {
@@ -86,5 +76,34 @@ func main() {
 		os.Exit(1)
 	}
 
-	glog.Info("updated node!")
+	glog.Info("node updated!")
+}
+
+func runFile(fileDir, fileName string, features map[string]string) error {
+	path := filepath.Join(fileDir, fileName)
+	filestat, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+
+	//if file is regular and executable
+	if filestat.Mode().IsRegular() && filestat.Mode()&0111 != 0 {
+		cmd := exec.Command(path)
+		var stdout, stderr bytes.Buffer
+		cmd.Stdout = &stdout
+		cmd.Stderr = &stderr
+
+		// Run hook
+		err = cmd.Run()
+
+		lines := bytes.Split(stdout.Bytes(), []byte("\n"))
+		for _, feature := range lines {
+			if len(feature) == 0 {
+				continue
+			}
+
+			features[string(feature)] = "true"
+		}
+	}
+	return nil
 }
