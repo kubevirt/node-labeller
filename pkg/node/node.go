@@ -68,7 +68,7 @@ func GetNodeLabellerLabels(node *v1.Node) map[string]bool {
 // RemoveCPUModelNodeLabels removes labels from node which were created by cpu-node-labeller
 func RemoveCPUModelNodeLabels(node *v1.Node, oldLabels map[string]bool) {
 	for label := range node.Labels {
-		if ok := oldLabels[label]; ok || strings.Contains(label, labelNamespace+"cpu-model-") {
+		if ok := oldLabels[label]; ok || strings.Contains(label, labelNamespace+"/cpu-model-") {
 			delete(node.Labels, label)
 		}
 	}
