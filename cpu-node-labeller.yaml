@@ -57,10 +57,20 @@ spec:
       serviceAccount: kubevirt-cpu-node-labeller
       containers:
       - name: kubevirt-cpu-node-labeller-sleeper
-        image: quay.io/ksimon/kubevirt-cpu-node-labeller:0.0.3
+        image: quay.io/ksimon/kubevirt-cpu-node-labeller:0.0.4
         command: ["sleep"]
         args: ["infinity"]
       initContainers:
+
+        - image: quay.io/fromani/kvm-info-nfd-plugin:v0.1.1
+          command: ["/bin/sh","-c"]
+          args: ["cp /usr/bin/kvm-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/; cp -r /etc/kvm-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/conf;"]
+          imagePullPolicy: Always
+          name: kvm-info-nfd-plugin
+          volumeMounts:
+            - name: nfd-source
+              mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
+  
         - image: quay.io/ksimon/kubevirt-cpu-model-nfd-plugin:0.0.2
           command: ["/bin/sh","-c"]
           args: ["cp /plugin/dest/cpu-model-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
@@ -90,12 +100,18 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          image: quay.io/ksimon/kubevirt-cpu-node-labeller:0.0.3
+          image: quay.io/ksimon/kubevirt-cpu-node-labeller:0.0.4
           name: kubevirt-cpu-node-labeller
           volumeMounts:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
+            - name: host-os-release
+              mountPath: "/etc/os-release"
+              readOnly: true
 
       volumes:
         - name: nfd-source
           emptyDir: {}
+        - name: host-os-release
+          hostPath:
+            path: "/etc/os-release"

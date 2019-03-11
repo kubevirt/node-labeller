@@ -28,8 +28,9 @@ import (
 )
 
 const (
-	nodeNameEnv    = "NODE_NAME"
-	labelNamespace = "feature.node.kubernetes.io"
+	nodeNameEnv       = "NODE_NAME"
+	labelNamespace    = "feature.node.kubernetes.io"
+	labellerNamespace = "node-labeller"
 )
 
 // GetNode gets node by name
@@ -48,13 +49,26 @@ func GetNode(client *k8sclient.Clientset) (*v1.Node, error) {
 func AddNodeLabels(node *v1.Node, labels map[string]string) {
 	for name, value := range labels {
 		node.Labels[labelNamespace+name] = value
+		node.Annotations[labellerNamespace+"-"+labelNamespace+name] = value
 	}
 }
 
-// RemoveCPUModelNodeLabels removes labels from node with prefix: feature.node.kubernetes.io/cpu-model-*
-func RemoveCPUModelNodeLabels(node *v1.Node) {
+// GetNodeLabellerLabels gets all labels which were created by cpu-node-labeller
+func GetNodeLabellerLabels(node *v1.Node) map[string]bool {
+	labellerLabels := make(map[string]bool)
+	for key := range node.Annotations {
+		if strings.Contains(key, labellerNamespace) {
+			delete(node.Annotations, key)
+			labellerLabels[key] = true
+		}
+	}
+	return labellerLabels
+}
+
+// RemoveCPUModelNodeLabels removes labels from node which were created by cpu-node-labeller
+func RemoveCPUModelNodeLabels(node *v1.Node, oldLabels map[string]bool) {
 	for label := range node.Labels {
-		if strings.Contains(label, labelNamespace+"cpu-model-") {
+		if ok := oldLabels[label]; ok || strings.Contains(label, labelNamespace+"/cpu-model-") {
 			delete(node.Labels, label)
 		}
 	}
