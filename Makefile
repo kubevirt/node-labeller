@@ -1,6 +1,6 @@
 all: docker clean
 
-VERSION="0.0.4"
+VERSION=`git describe --tags`
 
 push-image:
 	docker push quay.io/ksimon/kubevirt-cpu-node-labeller:${VERSION}

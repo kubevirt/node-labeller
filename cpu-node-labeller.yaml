@@ -57,7 +57,7 @@ spec:
       serviceAccount: kubevirt-cpu-node-labeller
       containers:
       - name: kubevirt-cpu-node-labeller-sleeper
-        image: quay.io/ksimon/kubevirt-cpu-node-labeller:0.0.4
+        image: quay.io/ksimon/kubevirt-cpu-node-labeller:v0.0.4
         command: ["sleep"]
         args: ["infinity"]
       initContainers:
@@ -100,7 +100,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          image: quay.io/ksimon/kubevirt-cpu-node-labeller:0.0.4
+          image: quay.io/ksimon/kubevirt-cpu-node-labeller:v0.0.4
           name: kubevirt-cpu-node-labeller
           volumeMounts:
             - name: nfd-source
