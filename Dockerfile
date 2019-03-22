@@ -7,7 +7,7 @@ ENV container docker
 RUN yum -y update
 RUN yum clean all
 
-COPY cpu-node-labeller /usr/sbin/cpu-node-labeller
+COPY kubevirt-node-labeller /usr/sbin/kubevirt-node-labeller
 
 
-ENTRYPOINT [ "/usr/sbin/cpu-node-labeller"]
+ENTRYPOINT [ "/usr/sbin/kubevirt-node-labeller"]

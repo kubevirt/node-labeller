@@ -53,7 +53,7 @@ func AddNodeLabels(node *v1.Node, labels map[string]string) {
 	}
 }
 
-// GetNodeLabellerLabels gets all labels which were created by cpu-node-labeller
+// GetNodeLabellerLabels gets all labels which were created by kubevirt-node-labeller
 func GetNodeLabellerLabels(node *v1.Node) map[string]bool {
 	labellerLabels := make(map[string]bool)
 	for key := range node.Annotations {
@@ -65,7 +65,7 @@ func GetNodeLabellerLabels(node *v1.Node) map[string]bool {
 	return labellerLabels
 }
 
-// RemoveCPUModelNodeLabels removes labels from node which were created by cpu-node-labeller
+// RemoveCPUModelNodeLabels removes labels from node which were created by kubevirt-node-labeller
 func RemoveCPUModelNodeLabels(node *v1.Node, oldLabels map[string]bool) {
 	for label := range node.Labels {
 		if ok := oldLabels[label]; ok || strings.Contains(label, labelNamespace+"/cpu-model-") {
