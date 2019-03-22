@@ -57,7 +57,7 @@ spec:
       serviceAccount: kubevirt-node-labeller
       containers:
       - name: kubevirt-node-labeller-sleeper
-        image: quay.io/ksimon/kubevirt-node-labeller:v0.0.4
+        image: quay.io/ksimon/kubevirt-node-labeller:v0.0.5
         command: ["sleep"]
         args: ["infinity"]
       initContainers:
@@ -71,7 +71,7 @@ spec:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
   
-        - image: quay.io/ksimon/kubevirt-cpu-nfd-plugin:0.0.2
+        - image: quay.io/ksimon/kubevirt-cpu-nfd-plugin:v0.0.3
           command: ["/bin/sh","-c"]
           args: ["cp /plugin/dest/kubevirt-cpu-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
           imagePullPolicy: Always
@@ -100,7 +100,7 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          image: quay.io/ksimon/kubevirt-node-labeller:v0.0.4
+          image: quay.io/ksimon/kubevirt-node-labeller:v0.0.5
           name: kubevirt-node-labeller
           volumeMounts:
             - name: nfd-source
