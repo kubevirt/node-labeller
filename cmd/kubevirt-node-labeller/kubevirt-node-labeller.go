@@ -28,15 +28,15 @@ import (
 	"path/filepath"
 
 	"github.com/golang/glog"
-	"github.com/ksimon1/cpu-node-labeller/pkg/client"
-	"github.com/ksimon1/cpu-node-labeller/pkg/node"
+	"kubevirt.io/kubevirt-node-labeller/pkg/client"
+	"kubevirt.io/kubevirt-node-labeller/pkg/node"
 )
 
 func main() {
 	fileDir := flag.String("fileDir", "/etc/kubernetes/node-feature-discovery/source.d/", "file folder")
 	flag.Parse()
 
-	glog.Infof("Running cpu-node-labeller")
+	glog.Infof("Running kubevirt-node-labeller")
 
 	files, err := ioutil.ReadDir(*fileDir)
 	if err != nil {
