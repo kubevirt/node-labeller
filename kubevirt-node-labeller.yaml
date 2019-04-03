@@ -39,6 +39,27 @@ subjects:
   name: kubevirt-node-labeller
   namespace: default
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubevirt-cpu-plugin-configmap
+data:
+  cpu-plugin-configmap.yaml: |- 
+    obsoleteCPUs:
+      - "486"
+      - "pentium"
+      - "pentium2"
+      - "pentium3"
+      - "pentiumpro"
+      - "coreduo"
+      - "n270"
+      - "core2duo"
+      - "Conroe"
+      - "athlon"
+      - "phenom"
+      - "kvm32"
+    minCPU: "Penryn"
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -62,7 +83,7 @@ spec:
         args: ["infinity"]
       initContainers:
 
-        - image: quay.io/fromani/kvm-info-nfd-plugin:v0.1.1
+        - image: quay.io/fromani/kvm-info-nfd-plugin:v0.2.1
           command: ["/bin/sh","-c"]
           args: ["cp /usr/bin/kvm-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/; cp -r /etc/kvm-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/conf;"]
           imagePullPolicy: Always
@@ -71,18 +92,20 @@ spec:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
   
-        - image: quay.io/ksimon/kubevirt-cpu-nfd-plugin:v0.0.3
+        - image: quay.io/ksimon/kubevirt-cpu-nfd-plugin:v0.0.4
           command: ["/bin/sh","-c"]
-          args: ["cp /plugin/dest/kubevirt-cpu-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
+          args: ["cp /plugin/dest/kubevirt-cpu-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/; cp /config/cpu-plugin-configmap.yaml /etc/kubernetes/node-feature-discovery/source.d/cpu-plugin-configmap.yaml;"]
           imagePullPolicy: Always
           name: kubevirt-cpu-nfd-plugin
           volumeMounts:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
+            - mountPath: /config
+              name: cpu-config
 
         - image: kubevirt/libvirt:5.0.0
           command: ["/bin/sh","-c"]
-          args: ["libvirtd -d; chmod o+rw /dev/kvm; virsh domcapabilities --machine q35 --arch x86_64 --virttype kvm > /etc/kubernetes/node-feature-discovery/source.d/virsh_domcapabilities.xml;"]
+          args: ["libvirtd -d; chmod o+rw /dev/kvm; virsh domcapabilities --machine q35 --arch x86_64 --virttype kvm > /etc/kubernetes/node-feature-discovery/source.d/virsh_domcapabilities.xml; cp -r /usr/share/libvirt/cpu_map /etc/kubernetes/node-feature-discovery/source.d/"]
           imagePullPolicy: Always
           name: libvirt
           securityContext:
@@ -115,3 +138,6 @@ spec:
         - name: host-os-release
           hostPath:
             path: "/etc/os-release"
+        - name: cpu-config
+          configMap:
+            name: kubevirt-cpu-plugin-configmap
