@@ -85,7 +85,7 @@ spec:
 
         - image: quay.io/fromani/kvm-info-nfd-plugin:v0.4.0
           command: ["/bin/sh","-c"]
-          args: ["chmod o+rw /dev/kvm; cp /usr/bin/kvm-caps-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
+          args: ["cp /usr/bin/kvm-caps-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
           imagePullPolicy: Always
           name: kvm-info-nfd-plugin
           volumeMounts:
