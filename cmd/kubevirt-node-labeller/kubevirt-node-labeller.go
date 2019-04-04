@@ -28,8 +28,8 @@ import (
 	"path/filepath"
 
 	"github.com/golang/glog"
-	"kubevirt.io/kubevirt-node-labeller/pkg/client"
-	"kubevirt.io/kubevirt-node-labeller/pkg/node"
+	"github.com/ksimon1/kubevirt-node-labeller/pkg/client"
+	"github.com/ksimon1/kubevirt-node-labeller/pkg/node"
 )
 
 func main() {
