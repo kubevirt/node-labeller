@@ -1,0 +1,12 @@
+language: go
+go: "1.10"
+
+services:
+- docker
+
+before_script:
+- go get -u github.com/golang/dep/cmd/dep
+
+install: true
+script: make image 
+
