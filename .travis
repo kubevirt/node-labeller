@@ -5,5 +5,5 @@ services:
 - docker
 
 install: true
-script: make image
+script: make image 
 
