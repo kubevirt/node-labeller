@@ -1,5 +1,3 @@
-all: docker clean
-
 VERSION=`git describe --tags`
 
 push-image:
@@ -20,4 +18,4 @@ clean:
 test:
 	go test ./...
 
-.PHONY: all push-image image binary clean test
+.PHONY: push-image image binary clean test
