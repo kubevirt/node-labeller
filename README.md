@@ -5,5 +5,5 @@
 
 **Install**
  ```
- oc apply -f kubevirt-node-labeller.yaml
+ oc apply -f deploy/<version>/
  ```
