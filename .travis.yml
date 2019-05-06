@@ -1,20 +1,42 @@
+sudo: required
+dist: xenial
 language: go
 go: "1.10"
 
 services:
 - docker
 
-before_script:
-- go get -u github.com/golang/dep/cmd/dep
-- echo "$NFDPASS" | docker login -u="$NFDNAME" quay.io --password-stdin
+branches:
+  only:
+  - master
 
+addons:
+  apt:
+    sources:
+    - sourceline: 'ppa:ansible/ansible'
+    packages:
+    - ansible
+    - jq
 
 jobs:
   include:
-  - stage: Build Image
-    name: build kubevirt-node-labeller image
-    script: make image 
+  - stage: Functional test
+    name: Test kubevirt-node-labeller bundle
+    before_script:
+    - git clone https://github.com/fabiand/traviskube.git
+    - mv traviskube ci 
+    - sudo mount --make-rshared /
+    - bash -x ci/prepare-host minishift
+    - bash -x ci/prepare-host oc
+    - bash -x ci/start-cluster minishift
+    - bash -x ci/deploy-kubevirt minishift v0.17.0
+    - eval $(minishift docker-env)
+    - ansible-playbook generate_template.yaml --extra-vars "@$(pwd)/ansible_vars/test_vars.yaml"
+    - oc project default
+    script: bash -x automation/functional_test.sh
     deploy:
+      before_script: 
+      - echo "$NFDPASS" | docker login -u="$NFDNAME" quay.io --password-stdin
       provider: script
       skip_cleanup: true
       script: make push-image
