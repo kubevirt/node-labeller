@@ -1,11 +1,8 @@
-FROM centos:7
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
 LABEL maintainer="ksimon@redhat.com"
 
 ENV container docker
-
-RUN yum -y update
-RUN yum clean all
 
 COPY kubevirt-node-labeller /usr/sbin/kubevirt-node-labeller
 
