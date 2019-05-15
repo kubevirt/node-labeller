@@ -3,21 +3,21 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   labels:
-    app: kubevirt-node-labeller
-  name: kubevirt-node-labeller
+    app: node-labeller
+  name: node-labeller
 spec:
   selector:
     matchLabels:
-      app: kubevirt-node-labeller
+      app: node-labeller
   template:
     metadata:
       labels:
-        app: kubevirt-node-labeller
+        app: node-labeller
     spec:
-      serviceAccount: kubevirt-node-labeller
+      serviceAccount: node-labeller
       containers:
-      - name: kubevirt-node-labeller-sleeper
-        image: quay.io/ksimon/kubevirt-node-labeller:<LABELLER_VERSION>
+      - name: node-labeller-sleeper
+        image: quay.io/kubevirt/node-labeller:<LABELLER_VERSION>
         command: ["sleep"]
         args: ["infinity"]
       initContainers:
@@ -31,11 +31,11 @@ spec:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
   
-        - image: quay.io/ksimon/kubevirt-cpu-nfd-plugin:<CPU_PLUGIN_VERSION>
+        - image: quay.io/kubevirt/cpu-nfd-plugin:<CPU_PLUGIN_VERSION>
           command: ["/bin/sh","-c"]
-          args: ["cp /plugin/dest/kubevirt-cpu-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/; cp /config/cpu-plugin-configmap.yaml /etc/kubernetes/node-feature-discovery/source.d/cpu-plugin-configmap.yaml;"]
+          args: ["cp /plugin/dest/cpu-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/; cp /config/cpu-plugin-configmap.yaml /etc/kubernetes/node-feature-discovery/source.d/cpu-plugin-configmap.yaml;"]
           imagePullPolicy: Always
-          name: kubevirt-cpu-nfd-plugin
+          name: cpu-nfd-plugin
           volumeMounts:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
@@ -62,8 +62,8 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          image: quay.io/ksimon/kubevirt-node-labeller:<LABELLER_VERSION>
-          name: kubevirt-node-labeller
+          image: quay.io/kubevirt/node-labeller:<LABELLER_VERSION>
+          name: node-labeller
           securityContext:
             privileged: true
           resources:
@@ -80,4 +80,4 @@ spec:
           emptyDir: {}
         - name: cpu-config
           configMap:
-            name: kubevirt-cpu-plugin-configmap
+            name: cpu-plugin-configmap

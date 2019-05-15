@@ -6,15 +6,16 @@ services:
 
 before_script:
 - go get -u github.com/golang/dep/cmd/dep
-- echo "$NFDPASS" | docker login -u="$NFDNAME" quay.io --password-stdin
 
 
 jobs:
   include:
   - stage: Build Image
-    name: build kubevirt-node-labeller image
+    name: build node-labeller image
     script: make image 
     deploy:
+      before_script: 
+      - echo "$NFDPASS" | docker login -u="$NFDNAME" quay.io --password-stdin
       provider: script
       skip_cleanup: true
       script: make push-image
