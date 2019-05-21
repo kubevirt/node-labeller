@@ -22,7 +22,7 @@ spec:
         args: ["infinity"]
       initContainers:
 
-        - image: quay.io/fromani/kvm-info-nfd-plugin:<KVM_INFO_VERSION>
+        - image: quay.io/kubevirt/kvm-info-nfd-plugin:<KVM_INFO_VERSION>
           command: ["/bin/sh","-c"]
           args: ["cp /usr/bin/kvm-caps-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
           imagePullPolicy: Always
