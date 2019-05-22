@@ -17,12 +17,11 @@ spec:
       serviceAccount: node-labeller
       containers:
       - name: node-labeller-sleeper
-        image: quay.io/kubevirt/node-labeller:<LABELLER_VERSION>
+        image: "{{ node_labeller_registry }}/node-labeller:{{ node_labeller_version }}"
         command: ["sleep"]
         args: ["infinity"]
       initContainers:
-
-        - image: quay.io/kubevirt/kvm-info-nfd-plugin:<KVM_INFO_VERSION>
+        - image: "{{ kvm_info_registry }}/kvm-info-nfd-plugin:{{ kvm_info_version }}"
           command: ["/bin/sh","-c"]
           args: ["cp /usr/bin/kvm-caps-info-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/;"]
           imagePullPolicy: Always
@@ -31,7 +30,7 @@ spec:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
   
-        - image: quay.io/kubevirt/cpu-nfd-plugin:<CPU_PLUGIN_VERSION>
+        - image: "{{ cpu_plugin_registry }}/cpu-nfd-plugin:{{ cpu_plugin_version }}"
           command: ["/bin/sh","-c"]
           args: ["cp /plugin/dest/cpu-nfd-plugin /etc/kubernetes/node-feature-discovery/source.d/; cp /config/cpu-plugin-configmap.yaml /etc/kubernetes/node-feature-discovery/source.d/cpu-plugin-configmap.yaml;"]
           imagePullPolicy: Always
@@ -42,11 +41,16 @@ spec:
             - mountPath: /config
               name: cpu-config
 
-        - image: kubevirt/virt-launcher:v0.16.0
+        - image: "{{ virt_launcher_registry }}/virt-launcher:{{ virt_launcher_version }}"
           command: ["/bin/sh","-c"]
+{% if use_kvm %}
           args: ["libvirtd -d; chmod o+rw /dev/kvm; virsh domcapabilities --machine q35 --arch x86_64 --virttype kvm > /etc/kubernetes/node-feature-discovery/source.d/virsh_domcapabilities.xml; cp -r /usr/share/libvirt/cpu_map /etc/kubernetes/node-feature-discovery/source.d/"]
+{% else %}
+          args: ["libvirtd -d; virsh domcapabilities --machine q35 --arch x86_64 --virttype qemu > /etc/kubernetes/node-feature-discovery/source.d/virsh_domcapabilities.xml; cp -r /usr/share/libvirt/cpu_map /etc/kubernetes/node-feature-discovery/source.d/"]
+{% endif %}
           imagePullPolicy: Always
           name: libvirt
+{% if use_kvm %}
           securityContext:
             privileged: true
           resources:
@@ -54,6 +58,7 @@ spec:
               devices.kubevirt.io/kvm: "1"
             limits:
               devices.kubevirt.io/kvm: "1"
+{% endif %}
           volumeMounts:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
@@ -62,8 +67,9 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-          image: quay.io/kubevirt/node-labeller:<LABELLER_VERSION>
           name: node-labeller
+          image: "{{ node_labeller_registry }}/node-labeller:{{ node_labeller_version }}"
+{% if use_kvm %}
           securityContext:
             privileged: true
           resources:
@@ -71,6 +77,7 @@ spec:
               devices.kubevirt.io/kvm: "1"
             limits:
               devices.kubevirt.io/kvm: "1"
+{% endif %}
           volumeMounts:
             - name: nfd-source
               mountPath: "/etc/kubernetes/node-feature-discovery/source.d/"
