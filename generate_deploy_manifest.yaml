@@ -1,0 +1,20 @@
+---
+- connection: local
+  hosts: 127.0.0.1
+  gather_facts: no
+  vars_files: "{{ playbook_dir }}/ansible_vars/vars.yaml"
+  tasks:
+  - name: Prepare release directory
+    file:
+      path: "{{ playbook_dir }}/deploy/{{ package_version }}"
+      state: directory
+
+  - name: Copy roles.yaml file
+    copy: src={{ playbook_dir }}/deploy/templates/roles.yaml dest={{ playbook_dir }}/deploy/{{ package_version }}/roles.yaml
+
+  - name: Generate deploy manifest
+    template:
+      src: "{{ playbook_dir }}/deploy/templates/node-labeller-ds.yaml"
+      dest: "{{ playbook_dir }}/deploy/{{ package_version }}/node-labeller-ds.yaml"
+
+
