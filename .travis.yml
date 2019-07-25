@@ -1,7 +1,7 @@
 sudo: required
 dist: xenial
 language: go
-go: "1.10"
+go: "1.12"
 
 services:
 - docker
@@ -29,7 +29,7 @@ jobs:
     - bash -x ci/prepare-host minishift
     - bash -x ci/prepare-host oc
     - bash -x ci/start-cluster minishift
-    - bash -x ci/deploy-kubevirt minishift v0.17.0
+    - bash -x ci/deploy-kubevirt minishift v0.19.0
     - eval $(minishift docker-env)
     - ansible-playbook generate_deploy_manifest.yaml --extra-vars "@$(pwd)/ansible_vars/test_vars.yaml"
     - oc project default
