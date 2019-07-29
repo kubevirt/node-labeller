@@ -1,4 +1,4 @@
-FROM golang:1.10 AS builder
+FROM golang:1.12 AS builder
 
 MAINTAINER "The KubeVirt Project" <kubevirt-dev@googlegroups.com>
 
@@ -8,11 +8,9 @@ ENV GOPATH=/go
 
 COPY . .
 
-RUN go get -u github.com/golang/dep/cmd/dep && dep ensure
+RUN GO111MODULE=on go test ./...
 
-RUN go test ./...
-
-RUN CGO_ENABLED=0 GOOS=linux go build -o /node-labeller cmd/node-labeller/node-labeller.go
+RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -o /node-labeller cmd/node-labeller/node-labeller.go
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 

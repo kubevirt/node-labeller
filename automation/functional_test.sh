@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 build_container(){
-  go get -u github.com/golang/dep/cmd/dep
   docker build -t test/node-labeller:test .
 }
 
