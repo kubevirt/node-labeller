@@ -8,9 +8,13 @@ ENV GOPATH=/go
 
 COPY . .
 
-RUN GO111MODULE=on go test ./...
+ENV export GO111MODULE=on
+ENV export GOPROXY=off
+ENV export GOFLAGS="-mod=vendor"
 
-RUN GO111MODULE=on CGO_ENABLED=0 GOOS=linux go build -o /node-labeller cmd/node-labeller/node-labeller.go
+RUN go test ./...
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /node-labeller cmd/node-labeller/node-labeller.go
 
 FROM registry.access.redhat.com/ubi8/ubi-minimal
 
