@@ -10,33 +10,22 @@ get_labeller_pods() {
 
 
 deploy_labeller(){
-  oc create -f deploy/test
+  oc apply -f _out/
   sleep 10
   oc describe ds
 
   while [[ "$( get_labeller_pods | wc -l)" -ge 1 ]];
   do
     oc get pods
-    oc describe pod --selector=app=node-labeller
+    oc describe pod --selector=app=kubevirt-node-labeller
     sleep 6;
   done
   oc get pods
 
   oc describe nodes
-}
 
-check_result(){
-  if [ $(oc get nodes -o json | jq '.items[0].metadata.labels' | grep "cpu-model" | wc -l) -eq 0 ]; then
-    echo "It should report cpu-models"
-    exit 1
-  fi
-
-  if [ $(oc get nodes -o json | jq '.items[0].metadata.labels' | grep "cpu-feature" | wc -l) -eq 0 ]; then
-    echo "It should report cpu-features"
-    exit 1
-  fi
+  exit 0
 }
 
 build_container
 deploy_labeller
-check_result

@@ -6,15 +6,15 @@
   tasks:
   - name: Prepare release directory
     file:
-      path: "{{ playbook_dir }}/deploy/{{ package_version }}"
+      path: "{{ playbook_dir }}/_out"
       state: directory
-
-  - name: Copy roles.yaml file
-    copy: src={{ playbook_dir }}/deploy/templates/roles.yaml dest={{ playbook_dir }}/deploy/{{ package_version }}/roles.yaml
-
   - name: Generate deploy manifest
     template:
-      src: "{{ playbook_dir }}/deploy/templates/node-labeller-ds.yaml"
-      dest: "{{ playbook_dir }}/deploy/{{ package_version }}/node-labeller-ds.yaml"
+      src: "{{ playbook_dir }}/deploy-templates/roles.yaml"
+      dest: "{{ playbook_dir }}/_out/roles.yaml"
+  - name: Generate deploy manifest
+    template:
+      src: "{{ playbook_dir }}/deploy-templates/node-labeller-ds.yaml"
+      dest: "{{ playbook_dir }}/_out/node-labeller-ds.yaml"
 
 
