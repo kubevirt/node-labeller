@@ -29,19 +29,33 @@ jobs:
     - bash -x ci/prepare-host minishift
     - bash -x ci/prepare-host oc
     - bash -x ci/start-cluster minishift
-    - bash -x ci/deploy-kubevirt minishift v0.19.0
+    - bash -x ci/deploy-kubevirt minishift v0.27.0
     - eval $(minishift docker-env)
     - ansible-playbook generate_deploy_manifest.yaml --extra-vars "@$(pwd)/ansible_vars/test_vars.yaml"
-    - oc project default
-    script: bash -x automation/functional_test.sh
+    - oc project kubevirt
+    script: 
+      - bash -x automation/functional_test.sh
+      - ansible-playbook generate_deploy_manifest.yaml
     deploy:
-      before_script: 
-      - echo "$NFDPASS" | docker login -u="$NFDNAME" quay.io --password-stdin
-      provider: script
-      skip_cleanup: true
-      script: make push-image
-      on:
-        branch: master
-        tags: true
+      - provider: script
+        before_script: 
+        - echo "$NFDPASS" | docker login -u="$NFDNAME" quay.io --password-stdin
+        skip_cleanup: true
+        script: make push-image
+        on:
+          branch: master
+          tags: true
+      - provider: releases
+        api_key: "$GITHUB_TOKEN"
+        skip_cleanup: true
+        overwrite: true
+        file_glob: true
+        file:
+        - _out/*
+        name: $TRAVIS_TAG
+        on:
+          tags: true
+          branch: master
+          repo: $TRAVIS_REPO_SLUG
 
 

@@ -1,11 +1,10 @@
 ---
-package_version: "test"
+namespace: "kubevirt"
 node_labeller_registry: "test"
 node_labeller_version: "test"
 cpu_plugin_registry: "quay.io/kubevirt"
 cpu_plugin_version: "v0.1.0"
 virt_launcher_registry: "kubevirt"
-virt_launcher_version: "v0.17.0"
+virt_launcher_version: "v0.27.0"
 kvm_info_registry: "quay.io/kubevirt"
-kvm_info_version: "v0.5.7"
-use_kvm: False
+kvm_info_version: "v0.5.8"
